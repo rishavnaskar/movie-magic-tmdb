@@ -10,6 +10,5 @@ export const getMovieDataApi = async (endPoint: string, page: number) => {
     },
   };
   const url = `${BASE_URLS.MOVIE_LIST}/${endPoint}?language=en-US&include_adult=false&include_video=false&page=${page}`;
-  console.log(url);
   return await fetch(url, options);
 };

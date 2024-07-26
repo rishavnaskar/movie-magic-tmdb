@@ -14,6 +14,8 @@ import {getPostImageUrl} from '../../utils/helper';
 import {FlashList} from '@shopify/flash-list';
 import FontIsto from 'react-native-vector-icons/Fontisto';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import {useNavigation} from '@react-navigation/native';
+import {SCREENS} from '../../navigation/routes';
 
 interface Props {
   movieDataState: MovieStateType;
@@ -21,6 +23,8 @@ interface Props {
 }
 
 const MovieListView = ({movieDataState, onEndReached}: Props) => {
+  const navigation = useNavigation();
+
   const renderLoader = () => (
     <ActivityIndicator
       size={60}
@@ -43,46 +47,50 @@ const MovieListView = ({movieDataState, onEndReached}: Props) => {
     </View>
   );
 
-  const renderMovieList = () => {
-    const renderItem = ({item}: {item: MovieType}) => {
-      const imgSource: ImageSourcePropType = {
-        uri: getPostImageUrl(item.poster_path, 'small'),
-      };
-      return (
-        <TouchableOpacity style={styles.listItemContainer}>
-          <Image source={imgSource} style={styles.posterImage} />
-          <View style={styles.movieListInfoContainer}>
-            <Text
-              numberOfLines={1}
-              ellipsizeMode="tail"
-              style={styles.movieTitle}>
-              {item.title}
-            </Text>
-            <Text style={styles.releaseDate}>Release: {item.release_date}</Text>
-            <View style={styles.ratingContainer}>
-              <FontIsto name="star" size={17} style={styles.ratingIcon} />
-              <Text style={styles.ratingText}>
-                {item.vote_average.toFixed(1)}
-              </Text>
-            </View>
-          </View>
-        </TouchableOpacity>
-      );
+  const onPressMovieItem = (item: MovieType) => {
+    navigation.navigate(SCREENS.MOVIE_ITEM_SCREEN, item);
+  };
+
+  const renderItem = ({item}: {item: MovieType}) => {
+    const imgSource: ImageSourcePropType = {
+      uri: getPostImageUrl(item.poster_path, 'small'),
     };
-
-    const keyExtractor = (item: MovieType) => item.id.toString();
-
     return (
-      <FlashList
-        data={movieDataState.data.results}
-        renderItem={renderItem}
-        keyExtractor={keyExtractor}
-        estimatedItemSize={140}
-        onEndReached={onEndReached}
-        contentContainerStyle={styles.listContainer}
-      />
+      <TouchableOpacity
+        style={styles.listItemContainer}
+        onPress={() => onPressMovieItem(item)}>
+        <Image source={imgSource} style={styles.posterImage} />
+        <View style={styles.movieListInfoContainer}>
+          <Text
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            style={styles.movieTitle}>
+            {item.title}
+          </Text>
+          <Text style={styles.releaseDate}>Release: {item.release_date}</Text>
+          <View style={styles.ratingContainer}>
+            <FontIsto name="star" size={17} style={styles.ratingIcon} />
+            <Text style={styles.ratingText}>
+              {item.vote_average.toFixed(1)}
+            </Text>
+          </View>
+        </View>
+      </TouchableOpacity>
     );
   };
+
+  const keyExtractor = (item: MovieType) => item.id.toString();
+
+  const renderMovieList = () => (
+    <FlashList
+      data={movieDataState.data.results}
+      renderItem={renderItem}
+      keyExtractor={keyExtractor}
+      estimatedItemSize={140}
+      onEndReached={onEndReached}
+      contentContainerStyle={styles.listContainer}
+    />
+  );
 
   if (movieDataState.data.page < 1 && movieDataState.loading) {
     return renderLoader();
@@ -127,6 +135,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     justifyContent: 'space-between',
     overflow: 'hidden',
+    elevation: 10,
   },
   posterImage: {
     height: 110,
@@ -138,6 +147,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.colorAccentSecondary,
     marginEnd: 16,
+    elevation: 10,
   },
   movieListInfoContainer: {
     alignItems: 'flex-end',
@@ -162,7 +172,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   ratingIcon: {
-    color: '#ECD996',
+    color: Colors.ratingColor,
     marginVertical: 8,
     marginHorizontal: 8,
   },

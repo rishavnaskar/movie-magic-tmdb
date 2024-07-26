@@ -19,7 +19,6 @@ import {getMovieDataApi} from '../../api';
 
 function* getDataHelper(endPoint: string, page: number) {
   try {
-    // return mockData;
     const response: Response = yield getMovieDataApi(endPoint, page);
     if (response.ok) {
       const jsonResponse: MovieListResponseType = yield response.json();

@@ -1,5 +1,5 @@
 const Colors = {
-  colorAccentPrimary: '#8D7DFA',
+  colorAccentPrimary: '#ECD996',
   colorAccentSecondary: '#242529',
   inactiveColor: 'grey',
   backgroundColor: '#202125',
@@ -9,6 +9,7 @@ const Colors = {
   iconColor: '#FFFFFF',
   cardBackground: '#242529',
   error: 'red',
+  ratingColor: '#ECD996',
 };
 
 export default Colors;
