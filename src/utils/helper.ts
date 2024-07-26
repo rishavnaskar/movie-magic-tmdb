@@ -1,4 +1,4 @@
-import {BASE_URLS} from '../api/constants';
+import {BASE_URLS} from '../api/base_urls';
 
 export const getPostImageUrl = (endPoint: string, size: 'small' | 'large') => {
   if (size === 'small') {

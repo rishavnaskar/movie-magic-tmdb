@@ -21,12 +21,16 @@ export type MovieStateType = {
 };
 
 export type CommonStateType = {
+  auth: {accountId: number | null};
   nowPlayingMovies: MovieStateType;
   popularMovies: MovieStateType;
   topRatedMovies: MovieStateType;
   upcomingMovies: MovieStateType;
   searchedMovies: MovieStateType;
+  favoriteMovies: MovieStateType;
 };
+
+export type MovieCommonListType = Omit<CommonStateType, 'auth'>;
 
 export type NavigationType = Omit<
   NavigationProp<ReactNavigation.RootParamList>,

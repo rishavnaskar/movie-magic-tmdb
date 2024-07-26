@@ -1,11 +1,12 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {SafeAreaView, StyleSheet, Text, TextInput, View} from 'react-native';
+import {SafeAreaView, StyleSheet, TextInput} from 'react-native';
 import Colors from '../../utils/colors';
 import {useDispatch, useSelector} from 'react-redux';
 import {CommonStateType} from '../../types';
 import MovieListView from '../components/MovieListView';
 import {searchMovieActions} from '../../redux/action';
 import {debounce} from 'lodash';
+import MovieListEmptyView from '../components/MovieListEmptyView';
 
 const MovieSearchScreen = () => {
   const [searchText, setSearchText] = useState('');
@@ -39,13 +40,6 @@ const MovieSearchScreen = () => {
     />
   );
 
-  const renderSearchEmptyView = () => (
-    <View style={styles.emptyContainer}>
-      <Text style={styles.emptyTitle}>Couldn't find any movies on this!</Text>
-      <Text style={styles.emptySubtitle}>Try searching something else...</Text>
-    </View>
-  );
-
   useEffect(() => {
     return () => {
       dispatch(searchMovieActions.resetData());
@@ -58,7 +52,9 @@ const MovieSearchScreen = () => {
       <MovieListView
         movieDataState={movieDataState}
         listHeaderComponent={renderSearchBox()}
-        listEmptyComponent={renderSearchEmptyView()}
+        listEmptyComponent={
+          <MovieListEmptyView subTitle="Try searching something else..." />
+        }
         movieAction={searchMovieActions}
         shouldFetchDataInitially={false}
       />
@@ -79,22 +75,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     color: Colors.textColor,
-  },
-  emptyContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 60,
-  },
-  emptyTitle: {
-    color: Colors.subTextColor,
-    textAlign: 'center',
-    fontSize: 20,
-  },
-  emptySubtitle: {
-    color: Colors.subTextColor,
-    fontSize: 16,
-    marginTop: 8,
   },
 });
 

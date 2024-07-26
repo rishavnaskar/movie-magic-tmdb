@@ -1,6 +1,8 @@
-import {CommonStateType, MovieType} from '../../types';
+import {CommonStateType, MovieCommonListType, MovieType} from '../../types';
 import {MovieListResponseType} from '../../types/responseTypes';
 import {
+  AUTHENTICATION_ACTION_TYPE,
+  FAVORITE_MOVIE_ACTION_TYPES,
   NOW_PLAYING_MOVIE_ACTIONS_TYPES,
   POPULAR_MOVIE_ACTIONS_TYPES,
   SEARCH_MOVIE_ACTIONS_TYPES,
@@ -9,10 +11,18 @@ import {
 } from '../action/constants';
 import {getInitialData, initialState} from '../state';
 
+const storeAccountId = (
+  state: CommonStateType,
+  payload: number,
+): CommonStateType => ({
+  ...state,
+  auth: {accountId: payload},
+});
+
 const setLoadingHelper = (
   state: CommonStateType,
   payload: boolean,
-  key: keyof CommonStateType,
+  key: keyof MovieCommonListType,
 ): CommonStateType => {
   const newState = {...state};
   newState[key] = {...newState[key], error: null, loading: payload};
@@ -22,7 +32,7 @@ const setLoadingHelper = (
 const setSuccessHelper = (
   state: CommonStateType,
   payload: MovieListResponseType,
-  key: keyof CommonStateType,
+  key: keyof MovieCommonListType,
 ): CommonStateType => {
   const newState = {...state};
   const resultsMap = new Map<number, MovieType>();
@@ -44,7 +54,7 @@ const setSuccessHelper = (
 const setPaginatedSuccessHelper = (
   state: CommonStateType,
   payload: MovieListResponseType,
-  key: keyof CommonStateType,
+  key: keyof MovieCommonListType,
 ): CommonStateType => {
   const newState = {...state};
   const newMap = new Map(newState[key].data.resultsMap);
@@ -74,7 +84,7 @@ const setPaginatedSuccessHelper = (
 const setFailureHelper = (
   state: CommonStateType,
   payload: Error,
-  key: keyof CommonStateType,
+  key: keyof MovieCommonListType,
 ): CommonStateType => {
   const newState = {...state};
   newState[key] = {...newState[key], loading: false, error: payload};
@@ -83,7 +93,7 @@ const setFailureHelper = (
 
 const resetData = (
   state: CommonStateType,
-  key: keyof CommonStateType,
+  key: keyof MovieCommonListType,
 ): CommonStateType => {
   const newState = {...state};
   newState[key] = getInitialData();
@@ -95,6 +105,9 @@ export const reducer = (
   action: {type: string; payload: any},
 ) => {
   switch (action.type) {
+    case AUTHENTICATION_ACTION_TYPE.STORE_ACCOUNT_ID:
+      return storeAccountId(state, action.payload);
+
     case NOW_PLAYING_MOVIE_ACTIONS_TYPES.SET_LOADING:
       return setLoadingHelper(state, action.payload, 'nowPlayingMovies');
     case NOW_PLAYING_MOVIE_ACTIONS_TYPES.SET_SUCCESS:
@@ -145,6 +158,18 @@ export const reducer = (
       return setFailureHelper(state, action.payload, 'searchedMovies');
     case SEARCH_MOVIE_ACTIONS_TYPES.RESET_DATA:
       return resetData(state, 'searchedMovies');
+
+    case FAVORITE_MOVIE_ACTION_TYPES.SET_LOADING:
+      return setLoadingHelper(state, action.payload, 'favoriteMovies');
+    case FAVORITE_MOVIE_ACTION_TYPES.SET_SUCCESS:
+      return setSuccessHelper(state, action.payload, 'favoriteMovies');
+    case FAVORITE_MOVIE_ACTION_TYPES.SET_PAGINATED_SUCCESS:
+      return setPaginatedSuccessHelper(state, action.payload, 'favoriteMovies');
+    case FAVORITE_MOVIE_ACTION_TYPES.SET_FAILURE:
+      return setFailureHelper(state, action.payload, 'favoriteMovies');
+    case FAVORITE_MOVIE_ACTION_TYPES.RESET_DATA:
+      return resetData(state, 'favoriteMovies');
+
     default:
       return state;
   }

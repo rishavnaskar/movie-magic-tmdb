@@ -1,4 +1,5 @@
 import {
+  StoreAccountIdSuccessActionType,
   GetMovieDataActionType,
   ResetDataActionType,
   SearchMovieDataActionType,
@@ -8,6 +9,8 @@ import {
 } from '../../types/actionTypes';
 import {MovieListResponseType} from '../../types/responseTypes';
 import {
+  AUTHENTICATION_ACTION_TYPE,
+  FAVORITE_MOVIE_ACTION_TYPES,
   NOW_PLAYING_MOVIE_ACTIONS_TYPES,
   POPULAR_MOVIE_ACTIONS_TYPES,
   SEARCH_MOVIE_ACTIONS_TYPES,
@@ -61,6 +64,15 @@ const resetDataHelper = (type: string): ResetDataActionType => ({
   type,
   payload: null,
 });
+
+export const authActions = {
+  storeAccountIdSuccess: (
+    accountId: number,
+  ): StoreAccountIdSuccessActionType => ({
+    type: AUTHENTICATION_ACTION_TYPE.STORE_ACCOUNT_ID,
+    payload: accountId,
+  }),
+};
 
 export const nowPlayingMovieActions: MovieActionType = {
   getData: page =>
@@ -142,4 +154,20 @@ export const searchMovieActions: MovieActionType = {
   setDataFailure: response =>
     setDataFailureHelper(SEARCH_MOVIE_ACTIONS_TYPES.SET_FAILURE, response),
   resetData: () => resetDataHelper(SEARCH_MOVIE_ACTIONS_TYPES.RESET_DATA),
+};
+
+export const favoriteMoviesAction: MovieActionType = {
+  getData: page => getDataHelper(FAVORITE_MOVIE_ACTION_TYPES.GET_DATA, page),
+  setDataLoading: val =>
+    setDataLoadingHelper(FAVORITE_MOVIE_ACTION_TYPES.SET_LOADING, val),
+  setDataSuccess: response =>
+    setDataSuccessHelper(FAVORITE_MOVIE_ACTION_TYPES.SET_SUCCESS, response),
+  setPaginatedDataSuccess: response =>
+    setDataSuccessHelper(
+      FAVORITE_MOVIE_ACTION_TYPES.SET_PAGINATED_SUCCESS,
+      response,
+    ),
+  setDataFailure: response =>
+    setDataFailureHelper(FAVORITE_MOVIE_ACTION_TYPES.SET_FAILURE, response),
+  resetData: () => resetDataHelper(FAVORITE_MOVIE_ACTION_TYPES.RESET_DATA),
 };

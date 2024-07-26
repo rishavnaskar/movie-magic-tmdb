@@ -6,6 +6,8 @@ import MovieItemScreen from '../ui/screens/MovieItemScreen';
 import {StyleSheet} from 'react-native';
 import Colors from '../utils/colors';
 import MovieSearchScreen from '../ui/screens/MovieSearchScreen';
+import MovieAuthWebViewScreen from '../ui/screens/MovieAuthWebViewScreen';
+import FavoritesScreen from '../ui/screens/FavoritesScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -33,6 +35,16 @@ const BottomTabs = () => {
         options={{
           headerTitle: 'Search Movies',
         }}
+      />
+      <Stack.Screen
+        name={SCREENS.AUTHENTICATION_WEB_VIEW_SCREEN}
+        component={MovieAuthWebViewScreen}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name={SCREENS.FAVORITES_SCREEN}
+        component={FavoritesScreen}
+        options={{headerTitle: 'Favorites'}}
       />
     </Stack.Navigator>
   );

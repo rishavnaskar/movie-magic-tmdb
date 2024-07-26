@@ -1,5 +1,5 @@
 import TMDB_ACCESS_TOKEN from '../config';
-import {BASE_URLS} from './constants';
+import {BASE_URLS} from './base_urls';
 
 const options = {
   method: 'GET',
@@ -7,6 +7,36 @@ const options = {
     accept: 'application/json',
     Authorization: `Bearer ${TMDB_ACCESS_TOKEN}`,
   },
+};
+
+const getPostOptions = (body: Object) => ({
+  method: 'POST',
+  headers: {
+    accept: 'application/json',
+    'content-type': 'application/json',
+    Authorization: `Bearer ${TMDB_ACCESS_TOKEN}`,
+  },
+  body: JSON.stringify(body),
+});
+
+export const authenticationUserApi = async () => {
+  return await fetch(BASE_URLS.AUTHENTICATE_USER, options);
+};
+
+export const createRequestTokenApi = async () => {
+  return await fetch(BASE_URLS.CREATE_REQUEST_TOKEN, options);
+};
+
+export const createSessionIdApi = async (requestToken: string) => {
+  return await fetch(
+    BASE_URLS.CREATE_SESSION_ID,
+    getPostOptions({request_token: requestToken}),
+  );
+};
+
+export const getUserDetailsApi = async (sessionId: string) => {
+  const url = `${BASE_URLS.GET_ACCOUNT_DETAILS}?session_id=${sessionId}`;
+  return await fetch(url, options);
 };
 
 export const getMovieDataApi = async (endPoint: string, page: number) => {

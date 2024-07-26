@@ -1,5 +1,10 @@
 import {MovieListResponseType} from './responseTypes';
 
+export type StoreAccountIdSuccessActionType = {
+  type: string;
+  payload: number;
+};
+
 export type GetMovieDataActionType = {
   type: string;
   payload: {page: number};

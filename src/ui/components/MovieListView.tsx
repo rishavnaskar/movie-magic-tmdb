@@ -92,6 +92,14 @@ const MovieListView = ({
   if (movieDataState.error) {
     return renderErrorContainer();
   }
+  if (movieDataState.data.results.length === 0) {
+    return (
+      <>
+        {listHeaderComponent}
+        {listEmptyComponent}
+      </>
+    );
+  }
   return renderMovieList();
 };
 

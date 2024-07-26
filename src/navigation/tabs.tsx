@@ -1,6 +1,6 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {StyleSheet, View} from 'react-native';
+import {ActivityIndicator, StyleSheet, View} from 'react-native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Colors from '../utils/colors';
@@ -10,11 +10,10 @@ import TopRatedScreen from '../ui/screens/movie_tabs/TopRatedScreen';
 import UpcomingScreen from '../ui/screens/movie_tabs/UpcomingScreen';
 import {ROUTES, SCREENS} from './routes';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {
-  NavigationProp,
-  NavigationState,
-  useNavigation,
-} from '@react-navigation/native';
+import {CommonStateType} from '../types';
+import {getRequestToken} from '../api/authentication';
+import {useSelector} from 'react-redux';
+import {useNavigation} from '@react-navigation/native';
 
 type TabBarIconProps = {
   focused: boolean;
@@ -25,6 +24,14 @@ type TabBarIconProps = {
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
+  const [isAuthInProgress, setIsAuthInProgress] = useState(false);
+
+  const accountId = useSelector(
+    (state: CommonStateType) => state.auth.accountId,
+  );
+
+  const navigation = useNavigation();
+
   const nowPlayingMoviesTabBarIcon = (props: TabBarIconProps) => (
     <MaterialIcon name="play-circle" {...props} />
   );
@@ -38,39 +45,57 @@ const TabNavigator = () => {
     <MaterialIcon name="fiber-new" {...props} />
   );
 
-  const onPressSearch = (
-    navigation: Omit<
-      NavigationProp<ReactNavigation.RootParamList>,
-      'getState'
-    > & {
-      getState(): NavigationState | undefined;
-    },
-  ) => {
+  const onPressSearch = () => {
     navigation.navigate(SCREENS.MOVIE_SEARCH_SCREEN);
   };
 
-  const headerRight = ({
-    tintColor,
-    navigation,
-  }: {
-    tintColor?: string;
-    navigation: any;
-  }) => {
+  const onPressFavorites = async () => {
+    if (accountId) {
+      navigation.navigate(SCREENS.FAVORITES_SCREEN);
+    } else {
+      setIsAuthInProgress(true);
+      const requestToken = await getRequestToken();
+      if (requestToken) {
+        navigation.navigate(SCREENS.AUTHENTICATION_WEB_VIEW_SCREEN, {
+          requestToken,
+        });
+      }
+      setIsAuthInProgress(false);
+    }
+  };
+
+  const headerRight = ({tintColor}: {tintColor?: string}) => {
     return (
       <View style={styles.headerRightContainer}>
         <MaterialCommunityIcons
           name="movie-search-outline"
           size={24}
           color={tintColor}
-          onPress={() => onPressSearch(navigation)}
+          style={styles.searchIcon}
+          onPress={onPressSearch}
         />
+        {isAuthInProgress ? (
+          <ActivityIndicator
+            size={24}
+            color={tintColor}
+            style={styles.favouriteIcon}
+          />
+        ) : (
+          <MaterialCommunityIcons
+            name="heart-pulse"
+            size={24}
+            color={tintColor}
+            style={styles.favouriteIcon}
+            onPress={onPressFavorites}
+          />
+        )}
       </View>
     );
   };
 
   return (
     <Tab.Navigator
-      screenOptions={({navigation}) => ({
+      screenOptions={{
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.headerTitleStyle,
         headerTintColor: Colors.headerColor,
@@ -79,8 +104,8 @@ const TabNavigator = () => {
         tabBarIconStyle: styles.tabBarIconStyle,
         tabBarInactiveTintColor: Colors.inactiveColor,
         tabBarActiveTintColor: Colors.colorAccentPrimary,
-        headerRight: ({tintColor}) => headerRight({navigation, tintColor}),
-      })}>
+        headerRight: ({tintColor}) => headerRight({tintColor}),
+      }}>
       <Tab.Screen
         options={{tabBarIcon: nowPlayingMoviesTabBarIcon}}
         name={ROUTES.NOW_PLAYING_MOVIES_TAB}
@@ -130,7 +155,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flex: 1,
     alignItems: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: 8,
+  },
+  searchIcon: {
+    paddingHorizontal: 8,
+  },
+  favouriteIcon: {
+    paddingHorizontal: 8,
   },
 });
 

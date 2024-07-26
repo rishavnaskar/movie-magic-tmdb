@@ -14,9 +14,11 @@ export const getInitialData = () =>
   } as MovieStateType);
 
 export const initialState: CommonStateType = {
+  auth: {accountId: null},
   nowPlayingMovies: getInitialData(),
   popularMovies: getInitialData(),
   topRatedMovies: getInitialData(),
   upcomingMovies: getInitialData(),
   searchedMovies: getInitialData(),
+  favoriteMovies: getInitialData(),
 };

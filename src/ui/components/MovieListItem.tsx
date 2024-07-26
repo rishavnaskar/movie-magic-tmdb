@@ -39,7 +39,7 @@ const MovieListItem = ({item}: Props) => {
   );
 
   const imgSource: ImageSourcePropType = {
-    uri: getPostImageUrl(item.poster_path, 'small'),
+    uri: getPostImageUrl(item.poster_path, 'large'),
   };
   return (
     <TouchableOpacity

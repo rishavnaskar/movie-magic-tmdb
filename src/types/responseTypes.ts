@@ -1,3 +1,33 @@
+export type AuthenticateUserResponseType = {
+  success: boolean;
+  status_code: number;
+  status_message: string;
+};
+
+export type CreateSessionTokenResponseType = {
+  success: boolean;
+  expires_at: string; // Date
+  request_token: string;
+};
+
+export type CreateSessionIdResponseType = {
+  success: boolean;
+  session_id: string;
+};
+
+export type GetUserDetailsResponseType = {
+  avatar: {
+    gravatar: {hash: string};
+    tmdb: {avatar_path: string | null};
+  };
+  id: number;
+  iso_639_1: string;
+  iso_3166_1: string;
+  name: string;
+  include_adult: boolean;
+  username: string;
+};
+
 export type MovieResponseType = {
   adult: boolean;
   backdrop_path: string;

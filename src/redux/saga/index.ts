@@ -7,6 +7,7 @@ import {
   SetMovieSuccessActionType,
 } from '../../types/actionTypes';
 import {
+  AuthenticateUserResponseType,
   MovieErrorResponseType,
   MovieListResponseType,
 } from '../../types/responseTypes';
@@ -27,6 +28,10 @@ type RequestParamsType =
   | {
       type: 'search';
       data: {query: string};
+    }
+  | {
+      type: 'favorites';
+      data: {sessionId: string};
     };
 
 function* getDataHelper(requestParams: RequestParamsType, page: number) {
@@ -144,5 +149,16 @@ export function* getSearchMovieData(action: SearchMovieDataActionType) {
     setDataSuccess: searchMovieActions.setDataSuccess,
     setPaginatedDataSuccess: searchMovieActions.setPaginatedDataSuccess,
     setDataFailure: searchMovieActions.setDataFailure,
+  });
+}
+
+export function* getFavoriteMovieData(action: GetMovieDataActionType) {
+  yield* apiHelper({
+    requestParams: {type: 'fetchData', data: {endPoint: 'upcoming'}},
+    page: action.payload.page,
+    setDataLoading: upcomingMovieActions.setDataLoading,
+    setDataSuccess: upcomingMovieActions.setDataSuccess,
+    setPaginatedDataSuccess: upcomingMovieActions.setPaginatedDataSuccess,
+    setDataFailure: upcomingMovieActions.setDataFailure,
   });
 }
