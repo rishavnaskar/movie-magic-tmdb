@@ -1,3 +1,4 @@
+import {NavigationProp, NavigationState} from '@react-navigation/native';
 import {MovieResponseType} from './responseTypes';
 
 export type MovieType = Omit<
@@ -25,4 +26,11 @@ export type CommonStateType = {
   topRatedMovies: MovieStateType;
   upcomingMovies: MovieStateType;
   searchedMovies: MovieStateType;
+};
+
+export type NavigationType = Omit<
+  NavigationProp<ReactNavigation.RootParamList>,
+  'getState'
+> & {
+  getState(): NavigationState | undefined;
 };

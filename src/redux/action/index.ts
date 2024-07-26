@@ -1,5 +1,6 @@
 import {
   GetMovieDataActionType,
+  ResetDataActionType,
   SearchMovieDataActionType,
   SetMovieFailureActionType,
   SetMovieLoadingActionType,
@@ -14,8 +15,8 @@ import {
   UPCOMING_MOVIE_ACTIONS_TYPES,
 } from './constants';
 
-type MovieActionType = {
-  getData: (page: number) => GetMovieDataActionType;
+export type MovieActionType = {
+  getData: (page: number, query?: string) => GetMovieDataActionType;
   setDataLoading: (val: boolean) => SetMovieLoadingActionType;
   setDataSuccess: (
     response: MovieListResponseType,
@@ -24,6 +25,7 @@ type MovieActionType = {
     response: MovieListResponseType,
   ) => SetMovieSuccessActionType;
   setDataFailure: (response: Error) => SetMovieFailureActionType;
+  resetData: () => ResetDataActionType;
 };
 
 const getDataHelper = (type: string, page: number): GetMovieDataActionType => ({
@@ -33,8 +35,8 @@ const getDataHelper = (type: string, page: number): GetMovieDataActionType => ({
 
 const searchDataHelper = (
   type: string,
-  query: string,
   page: number,
+  query?: string,
 ): SearchMovieDataActionType => ({type, payload: {query, page}});
 
 const setDataLoadingHelper = (
@@ -55,6 +57,11 @@ const setDataFailureHelper = (
   payload: error,
 });
 
+const resetDataHelper = (type: string): ResetDataActionType => ({
+  type,
+  payload: null,
+});
+
 export const nowPlayingMovieActions: MovieActionType = {
   getData: page =>
     getDataHelper(NOW_PLAYING_MOVIE_ACTIONS_TYPES.GET_DATA, page),
@@ -69,6 +76,7 @@ export const nowPlayingMovieActions: MovieActionType = {
     ),
   setDataFailure: response =>
     setDataFailureHelper(NOW_PLAYING_MOVIE_ACTIONS_TYPES.SET_FAILURE, response),
+  resetData: () => resetDataHelper(NOW_PLAYING_MOVIE_ACTIONS_TYPES.RESET_DATA),
 };
 
 export const popularMovieActions: MovieActionType = {
@@ -84,6 +92,7 @@ export const popularMovieActions: MovieActionType = {
     ),
   setDataFailure: response =>
     setDataFailureHelper(POPULAR_MOVIE_ACTIONS_TYPES.SET_FAILURE, response),
+  resetData: () => resetDataHelper(POPULAR_MOVIE_ACTIONS_TYPES.RESET_DATA),
 };
 
 export const topRatedMovieActions: MovieActionType = {
@@ -99,6 +108,7 @@ export const topRatedMovieActions: MovieActionType = {
     ),
   setDataFailure: response =>
     setDataFailureHelper(TOP_RATED_MOVIE_ACTIONS_TYPES.SET_FAILURE, response),
+  resetData: () => resetDataHelper(TOP_RATED_MOVIE_ACTIONS_TYPES.RESET_DATA),
 };
 
 export const upcomingMovieActions: MovieActionType = {
@@ -114,15 +124,22 @@ export const upcomingMovieActions: MovieActionType = {
     ),
   setDataFailure: response =>
     setDataFailureHelper(UPCOMING_MOVIE_ACTIONS_TYPES.SET_FAILURE, response),
+  resetData: () => resetDataHelper(UPCOMING_MOVIE_ACTIONS_TYPES.RESET_DATA),
 };
 
-export const searchMovieActions = {
-  getData: (query: string, page: number) =>
-    searchDataHelper(SEARCH_MOVIE_ACTIONS_TYPES.GET_DATA, query, page),
-  setDataLoading: (val: boolean) =>
+export const searchMovieActions: MovieActionType = {
+  getData: (page, query) =>
+    searchDataHelper(SEARCH_MOVIE_ACTIONS_TYPES.GET_DATA, page, query),
+  setDataLoading: val =>
     setDataLoadingHelper(SEARCH_MOVIE_ACTIONS_TYPES.SET_LOADING, val),
-  setDataSuccess: (response: MovieListResponseType) =>
+  setDataSuccess: response =>
     setDataSuccessHelper(SEARCH_MOVIE_ACTIONS_TYPES.SET_SUCCESS, response),
-  setDataFailure: (response: Error) =>
+  setPaginatedDataSuccess: response =>
+    setDataSuccessHelper(
+      SEARCH_MOVIE_ACTIONS_TYPES.SET_PAGINATED_SUCCESS,
+      response,
+    ),
+  setDataFailure: response =>
     setDataFailureHelper(SEARCH_MOVIE_ACTIONS_TYPES.SET_FAILURE, response),
+  resetData: () => resetDataHelper(SEARCH_MOVIE_ACTIONS_TYPES.RESET_DATA),
 };

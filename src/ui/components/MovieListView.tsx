@@ -1,29 +1,49 @@
-import React from 'react';
-import {
-  ActivityIndicator,
-  Image,
-  ImageSourcePropType,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import React, {ReactElement, useEffect, useState} from 'react';
+import {ActivityIndicator, StyleSheet, Text, View} from 'react-native';
 import Colors from '../../utils/colors';
 import {MovieStateType, MovieType} from '../../types';
-import {getPostImageUrl} from '../../utils/helper';
 import {FlashList} from '@shopify/flash-list';
-import FontIsto from 'react-native-vector-icons/Fontisto';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
-import {useNavigation} from '@react-navigation/native';
-import {SCREENS} from '../../navigation/routes';
+import {MovieActionType} from '../../redux/action';
+import {useDispatch} from 'react-redux';
+import MovieListItem from './MovieListItem';
 
 interface Props {
   movieDataState: MovieStateType;
-  onEndReached: () => void;
+  movieAction: MovieActionType;
+  listHeaderComponent?: ReactElement;
+  listEmptyComponent?: ReactElement;
+  shouldFetchDataInitially?: boolean;
 }
 
-const MovieListView = ({movieDataState, onEndReached}: Props) => {
-  const navigation = useNavigation();
+const MovieListView = ({
+  movieDataState,
+  movieAction,
+  listHeaderComponent,
+  listEmptyComponent,
+  shouldFetchDataInitially = true,
+}: Props) => {
+  const [page, setPage] = useState(1);
+
+  const dispatch = useDispatch();
+
+  const onEndReached = () => {
+    if (
+      movieDataState.data.results.length !==
+        movieDataState.data.total_results &&
+      page + 1 <= movieDataState.data.total_pages
+    ) {
+      dispatch(movieAction.getData(page + 1));
+      setPage(page + 1);
+    }
+  };
+
+  useEffect(() => {
+    if (shouldFetchDataInitially) {
+      dispatch(movieAction.getData(page));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [movieAction, shouldFetchDataInitially]);
 
   const renderLoader = () => (
     <ActivityIndicator
@@ -47,48 +67,22 @@ const MovieListView = ({movieDataState, onEndReached}: Props) => {
     </View>
   );
 
-  const onPressMovieItem = (item: MovieType) => {
-    navigation.navigate(SCREENS.MOVIE_ITEM_SCREEN, item);
-  };
-
-  const renderItem = ({item}: {item: MovieType}) => {
-    const imgSource: ImageSourcePropType = {
-      uri: getPostImageUrl(item.poster_path, 'small'),
-    };
-    return (
-      <TouchableOpacity
-        style={styles.listItemContainer}
-        onPress={() => onPressMovieItem(item)}>
-        <Image source={imgSource} style={styles.posterImage} />
-        <View style={styles.movieListInfoContainer}>
-          <Text
-            numberOfLines={1}
-            ellipsizeMode="tail"
-            style={styles.movieTitle}>
-            {item.title}
-          </Text>
-          <Text style={styles.releaseDate}>Release: {item.release_date}</Text>
-          <View style={styles.ratingContainer}>
-            <FontIsto name="star" size={17} style={styles.ratingIcon} />
-            <Text style={styles.ratingText}>
-              {item.vote_average.toFixed(1)}
-            </Text>
-          </View>
-        </View>
-      </TouchableOpacity>
-    );
-  };
+  const renderItem = ({item}: {item: MovieType}) => (
+    <MovieListItem item={item} />
+  );
 
   const keyExtractor = (item: MovieType) => item.id.toString();
 
   const renderMovieList = () => (
     <FlashList
       data={movieDataState.data.results}
+      estimatedItemSize={140}
+      contentContainerStyle={styles.listContainer}
+      ListHeaderComponent={listHeaderComponent}
+      ListEmptyComponent={listEmptyComponent}
       renderItem={renderItem}
       keyExtractor={keyExtractor}
-      estimatedItemSize={140}
       onEndReached={onEndReached}
-      contentContainerStyle={styles.listContainer}
     />
   );
 
@@ -98,10 +92,7 @@ const MovieListView = ({movieDataState, onEndReached}: Props) => {
   if (movieDataState.error) {
     return renderErrorContainer();
   }
-  if (movieDataState.data.results) {
-    return renderMovieList();
-  }
-  return <></>;
+  return renderMovieList();
 };
 
 const styles = StyleSheet.create({
@@ -124,60 +115,6 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     paddingBottom: 16,
-  },
-  listItemContainer: {
-    height: 140,
-    backgroundColor: Colors.cardBackground,
-    marginHorizontal: 16,
-    marginTop: 16,
-    padding: 16,
-    flexDirection: 'row',
-    borderRadius: 12,
-    justifyContent: 'space-between',
-    overflow: 'hidden',
-    elevation: 10,
-  },
-  posterImage: {
-    height: 110,
-    width: 100,
-    resizeMode: 'cover',
-    alignSelf: 'center',
-    overflow: 'hidden',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: Colors.colorAccentSecondary,
-    marginEnd: 16,
-    elevation: 10,
-  },
-  movieListInfoContainer: {
-    alignItems: 'flex-end',
-    flex: 1,
-  },
-  movieTitle: {
-    justifyContent: 'flex-end',
-    textAlign: 'right',
-    fontSize: 18,
-    color: Colors.textColor,
-    marginVertical: 16,
-  },
-  releaseDate: {
-    color: Colors.subTextColor,
-    justifyContent: 'flex-end',
-    textAlign: 'right',
-    fontSize: 14,
-    fontStyle: 'italic',
-  },
-  ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  ratingIcon: {
-    color: Colors.ratingColor,
-    marginVertical: 8,
-    marginHorizontal: 8,
-  },
-  ratingText: {
-    color: Colors.textColor,
   },
 });
 

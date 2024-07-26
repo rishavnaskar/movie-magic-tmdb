@@ -7,7 +7,7 @@ export type GetMovieDataActionType = {
 
 export type SearchMovieDataActionType = {
   type: string;
-  payload: {query: string; page: number};
+  payload: {query?: string; page: number};
 };
 
 export type SetMovieLoadingActionType = {
@@ -23,4 +23,9 @@ export type SetMovieSuccessActionType = {
 export type SetMovieFailureActionType = {
   type: string;
   payload: Error;
+};
+
+export type ResetDataActionType = {
+  type: string;
+  payload: any;
 };

@@ -7,7 +7,7 @@ import {
   TOP_RATED_MOVIE_ACTIONS_TYPES,
   UPCOMING_MOVIE_ACTIONS_TYPES,
 } from '../action/constants';
-import {initialState} from '../state';
+import {getInitialData, initialState} from '../state';
 
 const setLoadingHelper = (
   state: CommonStateType,
@@ -81,6 +81,15 @@ const setFailureHelper = (
   return newState;
 };
 
+const resetData = (
+  state: CommonStateType,
+  key: keyof CommonStateType,
+): CommonStateType => {
+  const newState = {...state};
+  newState[key] = getInitialData();
+  return newState;
+};
+
 export const reducer = (
   state = initialState,
   action: {type: string; payload: any},
@@ -134,6 +143,8 @@ export const reducer = (
       return setPaginatedSuccessHelper(state, action.payload, 'searchedMovies');
     case SEARCH_MOVIE_ACTIONS_TYPES.SET_FAILURE:
       return setFailureHelper(state, action.payload, 'searchedMovies');
+    case SEARCH_MOVIE_ACTIONS_TYPES.RESET_DATA:
+      return resetData(state, 'searchedMovies');
     default:
       return state;
   }

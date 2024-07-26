@@ -1,6 +1,6 @@
 import {CommonStateType, MovieStateType, MovieType} from '../../types';
 
-const getInitialData = () =>
+export const getInitialData = () =>
   ({
     data: {
       page: 0,

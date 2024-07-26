@@ -2,7 +2,6 @@ import React from 'react';
 import {
   Image,
   ImageSourcePropType,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,

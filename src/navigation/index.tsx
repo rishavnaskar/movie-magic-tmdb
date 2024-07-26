@@ -5,7 +5,7 @@ import {SCREENS} from './routes';
 import MovieItemScreen from '../ui/screens/MovieItemScreen';
 import {StyleSheet} from 'react-native';
 import Colors from '../utils/colors';
-import {MovieType} from '../types';
+import MovieSearchScreen from '../ui/screens/MovieSearchScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -15,6 +15,7 @@ const BottomTabs = () => {
       screenOptions={{
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.headerTitleStyle,
+        headerTintColor: Colors.headerColor,
       }}>
       <Stack.Screen
         name={SCREENS.TAB_SCREEN}
@@ -24,11 +25,13 @@ const BottomTabs = () => {
       <Stack.Screen
         name={SCREENS.MOVIE_ITEM_SCREEN}
         component={MovieItemScreen}
+        options={{headerTitle: ''}}
+      />
+      <Stack.Screen
+        name={SCREENS.MOVIE_SEARCH_SCREEN}
+        component={MovieSearchScreen}
         options={{
-          headerTitle: '',
-          headerStyle: styles.headerStyle,
-          headerTitleStyle: styles.headerTitleStyle,
-          headerTintColor: Colors.headerColor,
+          headerTitle: 'Search Movies',
         }}
       />
     </Stack.Navigator>

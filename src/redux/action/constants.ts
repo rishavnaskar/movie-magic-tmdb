@@ -4,6 +4,7 @@ const getCommonActionTypes = (key: string = '') => ({
   SET_SUCCESS: 'SetSuccess' + key,
   SET_PAGINATED_SUCCESS: 'SetPaginatedSuccess' + key,
   SET_FAILURE: 'SetFailure' + key,
+  RESET_DATA: 'ResetData' + key,
 });
 
 export const NOW_PLAYING_MOVIE_ACTIONS_TYPES =

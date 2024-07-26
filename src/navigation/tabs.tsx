@@ -1,6 +1,6 @@
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {StyleSheet} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Colors from '../utils/colors';
@@ -8,7 +8,13 @@ import NowPlayingScreen from '../ui/screens/movie_tabs/NowPlayingScreen';
 import PopularScreen from '../ui/screens/movie_tabs/PopularScreen';
 import TopRatedScreen from '../ui/screens/movie_tabs/TopRatedScreen';
 import UpcomingScreen from '../ui/screens/movie_tabs/UpcomingScreen';
-import {ROUTES} from './routes';
+import {ROUTES, SCREENS} from './routes';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {
+  NavigationProp,
+  NavigationState,
+  useNavigation,
+} from '@react-navigation/native';
 
 type TabBarIconProps = {
   focused: boolean;
@@ -32,17 +38,49 @@ const TabNavigator = () => {
     <MaterialIcon name="fiber-new" {...props} />
   );
 
+  const onPressSearch = (
+    navigation: Omit<
+      NavigationProp<ReactNavigation.RootParamList>,
+      'getState'
+    > & {
+      getState(): NavigationState | undefined;
+    },
+  ) => {
+    navigation.navigate(SCREENS.MOVIE_SEARCH_SCREEN);
+  };
+
+  const headerRight = ({
+    tintColor,
+    navigation,
+  }: {
+    tintColor?: string;
+    navigation: any;
+  }) => {
+    return (
+      <View style={styles.headerRightContainer}>
+        <MaterialCommunityIcons
+          name="movie-search-outline"
+          size={24}
+          color={tintColor}
+          onPress={() => onPressSearch(navigation)}
+        />
+      </View>
+    );
+  };
+
   return (
     <Tab.Navigator
-      screenOptions={{
+      screenOptions={({navigation}) => ({
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.headerTitleStyle,
+        headerTintColor: Colors.headerColor,
         tabBarLabelStyle: styles.tabBarLabelStyle,
         tabBarStyle: styles.tabBarStyle,
         tabBarIconStyle: styles.tabBarIconStyle,
         tabBarInactiveTintColor: Colors.inactiveColor,
         tabBarActiveTintColor: Colors.colorAccentPrimary,
-      }}>
+        headerRight: ({tintColor}) => headerRight({navigation, tintColor}),
+      })}>
       <Tab.Screen
         options={{tabBarIcon: nowPlayingMoviesTabBarIcon}}
         name={ROUTES.NOW_PLAYING_MOVIES_TAB}
@@ -87,6 +125,12 @@ const styles = StyleSheet.create({
   },
   tabBarIconStyle: {
     color: Colors.colorAccentPrimary,
+  },
+  headerRightContainer: {
+    flexDirection: 'row',
+    flex: 1,
+    alignItems: 'center',
+    paddingHorizontal: 16,
   },
 });
 

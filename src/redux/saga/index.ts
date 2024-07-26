@@ -1,6 +1,7 @@
 import {put} from 'redux-saga/effects';
 import {
   GetMovieDataActionType,
+  SearchMovieDataActionType,
   SetMovieFailureActionType,
   SetMovieLoadingActionType,
   SetMovieSuccessActionType,
@@ -12,14 +13,34 @@ import {
 import {
   nowPlayingMovieActions,
   popularMovieActions,
+  searchMovieActions,
   topRatedMovieActions,
   upcomingMovieActions,
 } from '../action';
-import {getMovieDataApi} from '../../api';
+import {getMovieDataApi, searchMovieApi} from '../../api';
 
-function* getDataHelper(endPoint: string, page: number) {
+type RequestParamsType =
+  | {
+      type: 'fetchData';
+      data: {endPoint: string};
+    }
+  | {
+      type: 'search';
+      data: {query: string};
+    };
+
+function* getDataHelper(requestParams: RequestParamsType, page: number) {
   try {
-    const response: Response = yield getMovieDataApi(endPoint, page);
+    let response: Response;
+    switch (requestParams.type) {
+      case 'search':
+        response = yield searchMovieApi(requestParams.data.query, page);
+        break;
+      case 'fetchData':
+      default:
+        response = yield getMovieDataApi(requestParams.data.endPoint, page);
+        break;
+    }
     if (response.ok) {
       const jsonResponse: MovieListResponseType = yield response.json();
       return jsonResponse;
@@ -40,14 +61,14 @@ const getError = (error: unknown) => {
 };
 
 function* apiHelper({
-  endPoint,
+  requestParams,
   page,
   setDataFailure,
   setDataLoading,
   setDataSuccess,
   setPaginatedDataSuccess,
 }: {
-  endPoint: string;
+  requestParams: RequestParamsType;
   page: number;
   setDataLoading: (val: boolean) => SetMovieLoadingActionType;
   setDataSuccess: (
@@ -60,7 +81,7 @@ function* apiHelper({
 }) {
   try {
     yield put(setDataLoading(true));
-    const response = yield* getDataHelper(endPoint, page);
+    const response = yield* getDataHelper(requestParams, page);
     if (page > 1) {
       yield put(setPaginatedDataSuccess(response));
     } else {
@@ -73,7 +94,7 @@ function* apiHelper({
 
 export function* getNowPlayingMovieData(action: GetMovieDataActionType) {
   yield* apiHelper({
-    endPoint: 'now_playing',
+    requestParams: {type: 'fetchData', data: {endPoint: 'now_playing'}},
     page: action.payload.page,
     setDataLoading: nowPlayingMovieActions.setDataLoading,
     setDataSuccess: nowPlayingMovieActions.setDataSuccess,
@@ -84,7 +105,7 @@ export function* getNowPlayingMovieData(action: GetMovieDataActionType) {
 
 export function* getPopularMovieData(action: GetMovieDataActionType) {
   yield* apiHelper({
-    endPoint: 'popular',
+    requestParams: {type: 'fetchData', data: {endPoint: 'popular'}},
     page: action.payload.page,
     setDataLoading: popularMovieActions.setDataLoading,
     setDataSuccess: popularMovieActions.setDataSuccess,
@@ -95,7 +116,7 @@ export function* getPopularMovieData(action: GetMovieDataActionType) {
 
 export function* getTopRatedMovieData(action: GetMovieDataActionType) {
   yield* apiHelper({
-    endPoint: 'top_rated',
+    requestParams: {type: 'fetchData', data: {endPoint: 'top_rated'}},
     page: action.payload.page,
     setDataLoading: topRatedMovieActions.setDataLoading,
     setDataSuccess: topRatedMovieActions.setDataSuccess,
@@ -106,7 +127,7 @@ export function* getTopRatedMovieData(action: GetMovieDataActionType) {
 
 export function* getUpcomingMovieData(action: GetMovieDataActionType) {
   yield* apiHelper({
-    endPoint: 'upcoming',
+    requestParams: {type: 'fetchData', data: {endPoint: 'upcoming'}},
     page: action.payload.page,
     setDataLoading: upcomingMovieActions.setDataLoading,
     setDataSuccess: upcomingMovieActions.setDataSuccess,
@@ -115,12 +136,13 @@ export function* getUpcomingMovieData(action: GetMovieDataActionType) {
   });
 }
 
-export function* getSearchMovieData(action: GetMovieDataActionType) {
-  //   try {
-  //     yield put(searchMovieActions.setDataLoading(true));
-  //     const response = yield* getDataHelper('now_playing', action.payload.page);
-  //     yield put(searchMovieActions.setDataSuccess(response));
-  //   } catch (error) {
-  //     yield put(searchMovieActions.setDataFailure(getError(error)));
-  //   }
+export function* getSearchMovieData(action: SearchMovieDataActionType) {
+  yield* apiHelper({
+    requestParams: {type: 'search', data: {query: action.payload.query ?? ''}},
+    page: action.payload.page,
+    setDataLoading: searchMovieActions.setDataLoading,
+    setDataSuccess: searchMovieActions.setDataSuccess,
+    setPaginatedDataSuccess: searchMovieActions.setPaginatedDataSuccess,
+    setDataFailure: searchMovieActions.setDataFailure,
+  });
 }
