@@ -48,3 +48,23 @@ export const searchMovieApi = async (query: string, page: number) => {
   const url = `${BASE_URLS.SEARCH_MOVIES}?query=${query}&language=en-US&include_adult=false&include_video=false&page=${page}`;
   return await fetch(url, options);
 };
+
+export const getFavoritesApi = async (accountId: number, page: number) => {
+  const url = `${BASE_URLS.GET_ACCOUNT_DETAILS}/${accountId}/favorite/movies?language=en-US&page=${page}&sort_by=created_at.desc`;
+  return await fetch(url, options);
+};
+
+export const setFavoriteMovieApi = async (
+  accountId: number,
+  movieId: number,
+) => {
+  const url = `${BASE_URLS.GET_ACCOUNT_DETAILS}/${accountId}/favorite`;
+  return await fetch(
+    url,
+    getPostOptions({
+      media_type: 'movie',
+      media_id: movieId,
+      favorite: true,
+    }),
+  );
+};

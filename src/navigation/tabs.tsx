@@ -11,9 +11,9 @@ import UpcomingScreen from '../ui/screens/movie_tabs/UpcomingScreen';
 import {ROUTES, SCREENS} from './routes';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {CommonStateType} from '../types';
-import {getRequestToken} from '../api/authentication';
+import {getRequestToken} from '../api/helper';
 import {useSelector} from 'react-redux';
-import {useNavigation} from '@react-navigation/native';
+import {StackActions, useNavigation} from '@react-navigation/native';
 
 type TabBarIconProps = {
   focused: boolean;
@@ -58,6 +58,7 @@ const TabNavigator = () => {
       if (requestToken) {
         navigation.navigate(SCREENS.AUTHENTICATION_WEB_VIEW_SCREEN, {
           requestToken,
+          isSourceFavoritesIcon: true,
         });
       }
       setIsAuthInProgress(false);

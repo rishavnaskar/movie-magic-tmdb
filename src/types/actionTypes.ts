@@ -34,3 +34,8 @@ export type ResetDataActionType = {
   type: string;
   payload: any;
 };
+
+export type GetFavoriteMovieActionType = {
+  type: string;
+  payload: {accountId?: number; page: number};
+};

@@ -11,44 +11,42 @@ import FavoritesScreen from '../ui/screens/FavoritesScreen';
 
 const Stack = createNativeStackNavigator();
 
-const BottomTabs = () => {
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        headerStyle: styles.headerStyle,
-        headerTitleStyle: styles.headerTitleStyle,
-        headerTintColor: Colors.headerColor,
-      }}>
-      <Stack.Screen
-        name={SCREENS.TAB_SCREEN}
-        component={TabNavigator}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name={SCREENS.MOVIE_ITEM_SCREEN}
-        component={MovieItemScreen}
-        options={{headerTitle: ''}}
-      />
-      <Stack.Screen
-        name={SCREENS.MOVIE_SEARCH_SCREEN}
-        component={MovieSearchScreen}
-        options={{
-          headerTitle: 'Search Movies',
-        }}
-      />
-      <Stack.Screen
-        name={SCREENS.AUTHENTICATION_WEB_VIEW_SCREEN}
-        component={MovieAuthWebViewScreen}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name={SCREENS.FAVORITES_SCREEN}
-        component={FavoritesScreen}
-        options={{headerTitle: 'Favorites'}}
-      />
-    </Stack.Navigator>
-  );
-};
+const BottomTabs = () => (
+  <Stack.Navigator
+    screenOptions={{
+      headerStyle: styles.headerStyle,
+      headerTitleStyle: styles.headerTitleStyle,
+      headerTintColor: Colors.headerColor,
+    }}>
+    <Stack.Screen
+      name={SCREENS.TAB_SCREEN}
+      component={TabNavigator}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name={SCREENS.MOVIE_ITEM_SCREEN}
+      component={MovieItemScreen}
+      options={{headerTitle: ''}}
+    />
+    <Stack.Screen
+      name={SCREENS.MOVIE_SEARCH_SCREEN}
+      component={MovieSearchScreen}
+      options={{
+        headerTitle: 'Search Movies',
+      }}
+    />
+    <Stack.Screen
+      name={SCREENS.AUTHENTICATION_WEB_VIEW_SCREEN}
+      component={MovieAuthWebViewScreen}
+      options={{headerShown: false}}
+    />
+    <Stack.Screen
+      name={SCREENS.FAVORITES_SCREEN}
+      component={FavoritesScreen}
+      options={{headerTitle: 'Favorites'}}
+    />
+  </Stack.Navigator>
+);
 
 const styles = StyleSheet.create({
   headerStyle: {

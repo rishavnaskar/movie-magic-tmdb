@@ -3,6 +3,7 @@ import {
   createRequestTokenApi,
   createSessionIdApi,
   getUserDetailsApi,
+  setFavoriteMovieApi,
 } from '.';
 import {
   AuthenticateUserResponseType,
@@ -78,6 +79,15 @@ export const getUserAccountId = async (requestToken: string) => {
       return jsonResponse.id;
     }
     throw new Error('Failed to get user details');
+  } catch (error) {
+    return null;
+  }
+};
+
+export const setFavoriteMovie = async (accountId: number, movieId: number) => {
+  try {
+    const response = await setFavoriteMovieApi(accountId, movieId);
+    return response.ok;
   } catch (error) {
     return null;
   }

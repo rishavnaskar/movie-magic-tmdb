@@ -1,5 +1,6 @@
 import {takeLatest} from 'redux-saga/effects';
 import {
+  FAVORITE_MOVIE_ACTION_TYPES,
   NOW_PLAYING_MOVIE_ACTIONS_TYPES,
   POPULAR_MOVIE_ACTIONS_TYPES,
   SEARCH_MOVIE_ACTIONS_TYPES,
@@ -7,6 +8,7 @@ import {
   UPCOMING_MOVIE_ACTIONS_TYPES,
 } from '../action/constants';
 import {
+  getFavoriteMovieData,
   getNowPlayingMovieData,
   getPopularMovieData,
   getSearchMovieData,
@@ -30,5 +32,9 @@ export function* handler() {
       getUpcomingMovieData,
     ),
     yield takeLatest(SEARCH_MOVIE_ACTIONS_TYPES.GET_DATA, getSearchMovieData),
+    yield takeLatest(
+      FAVORITE_MOVIE_ACTION_TYPES.GET_DATA,
+      getFavoriteMovieData,
+    ),
   ];
 }

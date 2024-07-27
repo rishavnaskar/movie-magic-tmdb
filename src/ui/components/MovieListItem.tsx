@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {
+  ActivityIndicator,
   Image,
   ImageSourcePropType,
   StyleSheet,
@@ -14,15 +15,46 @@ import {SCREENS} from '../../navigation/routes';
 import {useNavigation} from '@react-navigation/native';
 import Colors from '../../utils/colors';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import {getRequestToken, setFavoriteMovie} from '../../api/helper';
+import Snackbar from 'react-native-snackbar';
 
 interface Props {
   item: MovieType;
+  accountId: number | null;
 }
 
-const MovieListItem = ({item}: Props) => {
+const MovieListItem = ({item, accountId}: Props) => {
   const [imageError, setImageError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigation = useNavigation();
+
+  const onAddMovieToFavorites = async () => {
+    setIsLoading(true);
+    if (accountId) {
+      const response = await setFavoriteMovie(accountId, item.id);
+      if (response) {
+        Snackbar.show({
+          text: 'Successfully added movie to favorites!',
+          duration: Snackbar.LENGTH_LONG,
+        });
+      } else {
+        Snackbar.show({
+          text: 'Failed to add movie to favorites',
+          duration: Snackbar.LENGTH_LONG,
+        });
+      }
+    } else {
+      const requestToken = await getRequestToken();
+      if (requestToken) {
+        navigation.navigate(SCREENS.AUTHENTICATION_WEB_VIEW_SCREEN, {
+          requestToken,
+          isSourceFavoritesIcon: false,
+        });
+      }
+    }
+    setIsLoading(false);
+  };
 
   const onPressMovieItem = (val: MovieType) => {
     navigation.navigate(SCREENS.MOVIE_ITEM_SCREEN, val);
@@ -41,10 +73,12 @@ const MovieListItem = ({item}: Props) => {
   const imgSource: ImageSourcePropType = {
     uri: getPostImageUrl(item.poster_path, 'large'),
   };
+
   return (
     <TouchableOpacity
       style={styles.listItemContainer}
-      onPress={() => onPressMovieItem(item)}>
+      onPress={() => onPressMovieItem(item)}
+      onLongPress={onAddMovieToFavorites}>
       {imageError ? (
         renderErrorView()
       ) : (
@@ -60,6 +94,13 @@ const MovieListItem = ({item}: Props) => {
         </Text>
         <Text style={styles.releaseDate}>Release: {item.release_date}</Text>
         <View style={styles.ratingContainer}>
+          {isLoading ? (
+            <ActivityIndicator
+              size={16}
+              color={Colors.textColor}
+              style={styles.loader}
+            />
+          ) : null}
           <FontIsto name="star" size={17} style={styles.ratingIcon} />
           <Text style={styles.ratingText}>{item.vote_average.toFixed(1)}</Text>
         </View>
@@ -135,6 +176,9 @@ const styles = StyleSheet.create({
   },
   ratingText: {
     color: Colors.textColor,
+  },
+  loader: {
+    marginEnd: 8,
   },
 });
 

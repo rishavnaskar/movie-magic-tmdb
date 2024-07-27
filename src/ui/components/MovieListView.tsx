@@ -1,31 +1,53 @@
 import React, {ReactElement, useEffect, useState} from 'react';
-import {ActivityIndicator, StyleSheet, Text, View} from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import Colors from '../../utils/colors';
-import {MovieStateType, MovieType} from '../../types';
-import {FlashList} from '@shopify/flash-list';
+import {CommonStateType, MovieStateType, MovieType} from '../../types';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import {MovieActionType} from '../../redux/action';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import MovieListItem from './MovieListItem';
 
 interface Props {
   movieDataState: MovieStateType;
   movieAction: MovieActionType;
-  listHeaderComponent?: ReactElement;
-  listEmptyComponent?: ReactElement;
   shouldFetchDataInitially?: boolean;
+  debouncedSearchTextRef?: React.MutableRefObject<string>;
+  listHeaderComponent?: () => ReactElement;
 }
 
 const MovieListView = ({
   movieDataState,
   movieAction,
-  listHeaderComponent,
-  listEmptyComponent,
   shouldFetchDataInitially = true,
+  debouncedSearchTextRef,
+  listHeaderComponent,
 }: Props) => {
   const [page, setPage] = useState(1);
 
+  const accountId = useSelector(
+    (state: CommonStateType) => state.auth.accountId,
+  );
+
   const dispatch = useDispatch();
+
+  const getData = (selectedPageNumber: number) => {
+    dispatch(
+      movieAction.getData({
+        page: selectedPageNumber,
+        ...(debouncedSearchTextRef?.current
+          ? {query: debouncedSearchTextRef.current}
+          : {}),
+        ...(accountId ? {accountId} : {}),
+      }),
+    );
+  };
 
   const onEndReached = () => {
     if (
@@ -33,17 +55,37 @@ const MovieListView = ({
         movieDataState.data.total_results &&
       page + 1 <= movieDataState.data.total_pages
     ) {
-      dispatch(movieAction.getData(page + 1));
+      getData(page + 1);
       setPage(page + 1);
     }
   };
 
   useEffect(() => {
     if (shouldFetchDataInitially) {
-      dispatch(movieAction.getData(page));
+      getData(page);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [movieAction, shouldFetchDataInitially]);
+
+  const renderHeaderComponent = () => {
+    return (
+      <>
+        {listHeaderComponent?.()}
+        {movieDataState.data.results.length > 0 ? (
+          <Text style={styles.longPressHintText}>
+            Long press on a movie to add it to favorites!
+          </Text>
+        ) : null}
+      </>
+    );
+  };
+
+  const renderEmptyView = () => (
+    <View style={styles.emptyContainer}>
+      <Text style={styles.emptyTitle}>Couldn't find any movies on this!</Text>
+      <Text style={styles.emptySubtitle}>Please try again...</Text>
+    </View>
+  );
 
   const renderLoader = () => (
     <ActivityIndicator
@@ -68,18 +110,26 @@ const MovieListView = ({
   );
 
   const renderItem = ({item}: {item: MovieType}) => (
-    <MovieListItem item={item} />
+    <MovieListItem item={item} accountId={accountId} />
   );
 
   const keyExtractor = (item: MovieType) => item.id.toString();
 
   const renderMovieList = () => (
-    <FlashList
+    <FlatList
+      refreshControl={
+        <RefreshControl
+          refreshing={
+            movieDataState.loading && movieDataState.data.results.length > 0
+          }
+          progressBackgroundColor={Colors.cardBackground}
+          colors={[Colors.colorAccentPrimary, Colors.colorAccentPrimary]}
+        />
+      }
       data={movieDataState.data.results}
-      estimatedItemSize={140}
       contentContainerStyle={styles.listContainer}
-      ListHeaderComponent={listHeaderComponent}
-      ListEmptyComponent={listEmptyComponent}
+      ListHeaderComponent={renderHeaderComponent()}
+      ListEmptyComponent={renderEmptyView()}
       renderItem={renderItem}
       keyExtractor={keyExtractor}
       onEndReached={onEndReached}
@@ -91,14 +141,6 @@ const MovieListView = ({
   }
   if (movieDataState.error) {
     return renderErrorContainer();
-  }
-  if (movieDataState.data.results.length === 0) {
-    return (
-      <>
-        {listHeaderComponent}
-        {listEmptyComponent}
-      </>
-    );
   }
   return renderMovieList();
 };
@@ -123,6 +165,30 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     paddingBottom: 16,
+    flexGrow: 1,
+  },
+  longPressHintText: {
+    color: Colors.subTextColor,
+    textAlign: 'center',
+    fontStyle: 'italic',
+    fontWeight: 'bold',
+    marginTop: 16,
+  },
+  emptyContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 60,
+  },
+  emptyTitle: {
+    color: Colors.subTextColor,
+    textAlign: 'center',
+    fontSize: 20,
+  },
+  emptySubtitle: {
+    color: Colors.subTextColor,
+    fontSize: 16,
+    marginTop: 8,
   },
 });
 

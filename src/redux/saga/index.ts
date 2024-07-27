@@ -2,23 +2,24 @@ import {put} from 'redux-saga/effects';
 import {
   GetMovieDataActionType,
   SearchMovieDataActionType,
+  GetFavoriteMovieActionType,
   SetMovieFailureActionType,
   SetMovieLoadingActionType,
   SetMovieSuccessActionType,
 } from '../../types/actionTypes';
 import {
-  AuthenticateUserResponseType,
   MovieErrorResponseType,
   MovieListResponseType,
 } from '../../types/responseTypes';
 import {
+  favoriteMoviesAction,
   nowPlayingMovieActions,
   popularMovieActions,
   searchMovieActions,
   topRatedMovieActions,
   upcomingMovieActions,
 } from '../action';
-import {getMovieDataApi, searchMovieApi} from '../../api';
+import {getFavoritesApi, getMovieDataApi, searchMovieApi} from '../../api';
 
 type RequestParamsType =
   | {
@@ -31,7 +32,7 @@ type RequestParamsType =
     }
   | {
       type: 'favorites';
-      data: {sessionId: string};
+      data: {accountId: number};
     };
 
 function* getDataHelper(requestParams: RequestParamsType, page: number) {
@@ -40,6 +41,9 @@ function* getDataHelper(requestParams: RequestParamsType, page: number) {
     switch (requestParams.type) {
       case 'search':
         response = yield searchMovieApi(requestParams.data.query, page);
+        break;
+      case 'favorites':
+        response = yield getFavoritesApi(requestParams.data.accountId, page);
         break;
       case 'fetchData':
       default:
@@ -152,13 +156,20 @@ export function* getSearchMovieData(action: SearchMovieDataActionType) {
   });
 }
 
-export function* getFavoriteMovieData(action: GetMovieDataActionType) {
-  yield* apiHelper({
-    requestParams: {type: 'fetchData', data: {endPoint: 'upcoming'}},
-    page: action.payload.page,
-    setDataLoading: upcomingMovieActions.setDataLoading,
-    setDataSuccess: upcomingMovieActions.setDataSuccess,
-    setPaginatedDataSuccess: upcomingMovieActions.setPaginatedDataSuccess,
-    setDataFailure: upcomingMovieActions.setDataFailure,
-  });
+export function* getFavoriteMovieData(action: GetFavoriteMovieActionType) {
+  if (action.payload.accountId) {
+    yield* apiHelper({
+      requestParams: {
+        type: 'favorites',
+        data: {accountId: action.payload.accountId},
+      },
+      page: action.payload.page,
+      setDataLoading: favoriteMoviesAction.setDataLoading,
+      setDataSuccess: favoriteMoviesAction.setDataSuccess,
+      setPaginatedDataSuccess: favoriteMoviesAction.setPaginatedDataSuccess,
+      setDataFailure: favoriteMoviesAction.setDataFailure,
+    });
+  } else {
+    console.error('Received empty account id');
+  }
 }

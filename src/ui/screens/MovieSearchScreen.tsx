@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {SafeAreaView, StyleSheet, TextInput} from 'react-native';
 import Colors from '../../utils/colors';
 import {useDispatch, useSelector} from 'react-redux';
@@ -6,10 +6,11 @@ import {CommonStateType} from '../../types';
 import MovieListView from '../components/MovieListView';
 import {searchMovieActions} from '../../redux/action';
 import {debounce} from 'lodash';
-import MovieListEmptyView from '../components/MovieListEmptyView';
 
 const MovieSearchScreen = () => {
   const [searchText, setSearchText] = useState('');
+
+  const debouncedSearchTextRef = useRef(searchText);
 
   const movieDataState = useSelector(
     (state: CommonStateType) => state.searchedMovies,
@@ -18,6 +19,7 @@ const MovieSearchScreen = () => {
   const dispatch = useDispatch();
 
   const searchData = (query: string) => {
+    debouncedSearchTextRef.current = query;
     dispatch(searchMovieActions.getData(1, query));
   };
 
@@ -51,12 +53,10 @@ const MovieSearchScreen = () => {
     <SafeAreaView style={styles.container}>
       <MovieListView
         movieDataState={movieDataState}
-        listHeaderComponent={renderSearchBox()}
-        listEmptyComponent={
-          <MovieListEmptyView subTitle="Try searching something else..." />
-        }
         movieAction={searchMovieActions}
         shouldFetchDataInitially={false}
+        debouncedSearchTextRef={debouncedSearchTextRef}
+        listHeaderComponent={renderSearchBox}
       />
     </SafeAreaView>
   );
@@ -69,7 +69,8 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     backgroundColor: Colors.cardBackground,
-    marginVertical: 20,
+    marginTop: 20,
+    marginBottom: 4,
     marginHorizontal: 16,
     borderRadius: 12,
     paddingHorizontal: 16,

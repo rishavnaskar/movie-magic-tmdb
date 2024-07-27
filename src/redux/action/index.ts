@@ -6,6 +6,7 @@ import {
   SetMovieFailureActionType,
   SetMovieLoadingActionType,
   SetMovieSuccessActionType,
+  GetFavoriteMovieActionType,
 } from '../../types/actionTypes';
 import {MovieListResponseType} from '../../types/responseTypes';
 import {
@@ -19,7 +20,11 @@ import {
 } from './constants';
 
 export type MovieActionType = {
-  getData: (page: number, query?: string) => GetMovieDataActionType;
+  getData: (props: {
+    page: number;
+    query?: string;
+    accountId?: number;
+  }) => GetMovieDataActionType;
   setDataLoading: (val: boolean) => SetMovieLoadingActionType;
   setDataSuccess: (
     response: MovieListResponseType,
@@ -65,6 +70,15 @@ const resetDataHelper = (type: string): ResetDataActionType => ({
   payload: null,
 });
 
+const getFavoritesDataHelper = (
+  type: string,
+  page: number,
+  accountId?: number,
+): GetFavoriteMovieActionType => ({
+  type,
+  payload: {accountId, page},
+});
+
 export const authActions = {
   storeAccountIdSuccess: (
     accountId: number,
@@ -75,7 +89,7 @@ export const authActions = {
 };
 
 export const nowPlayingMovieActions: MovieActionType = {
-  getData: page =>
+  getData: ({page}) =>
     getDataHelper(NOW_PLAYING_MOVIE_ACTIONS_TYPES.GET_DATA, page),
   setDataLoading: val =>
     setDataLoadingHelper(NOW_PLAYING_MOVIE_ACTIONS_TYPES.SET_LOADING, val),
@@ -92,7 +106,8 @@ export const nowPlayingMovieActions: MovieActionType = {
 };
 
 export const popularMovieActions: MovieActionType = {
-  getData: page => getDataHelper(POPULAR_MOVIE_ACTIONS_TYPES.GET_DATA, page),
+  getData: ({page}) =>
+    getDataHelper(POPULAR_MOVIE_ACTIONS_TYPES.GET_DATA, page),
   setDataLoading: val =>
     setDataLoadingHelper(POPULAR_MOVIE_ACTIONS_TYPES.SET_LOADING, val),
   setDataSuccess: response =>
@@ -108,7 +123,8 @@ export const popularMovieActions: MovieActionType = {
 };
 
 export const topRatedMovieActions: MovieActionType = {
-  getData: page => getDataHelper(TOP_RATED_MOVIE_ACTIONS_TYPES.GET_DATA, page),
+  getData: ({page}) =>
+    getDataHelper(TOP_RATED_MOVIE_ACTIONS_TYPES.GET_DATA, page),
   setDataLoading: val =>
     setDataLoadingHelper(TOP_RATED_MOVIE_ACTIONS_TYPES.SET_LOADING, val),
   setDataSuccess: response =>
@@ -124,7 +140,8 @@ export const topRatedMovieActions: MovieActionType = {
 };
 
 export const upcomingMovieActions: MovieActionType = {
-  getData: page => getDataHelper(UPCOMING_MOVIE_ACTIONS_TYPES.GET_DATA, page),
+  getData: ({page}) =>
+    getDataHelper(UPCOMING_MOVIE_ACTIONS_TYPES.GET_DATA, page),
   setDataLoading: val =>
     setDataLoadingHelper(UPCOMING_MOVIE_ACTIONS_TYPES.SET_LOADING, val),
   setDataSuccess: response =>
@@ -140,7 +157,7 @@ export const upcomingMovieActions: MovieActionType = {
 };
 
 export const searchMovieActions: MovieActionType = {
-  getData: (page, query) =>
+  getData: ({page, query}) =>
     searchDataHelper(SEARCH_MOVIE_ACTIONS_TYPES.GET_DATA, page, query),
   setDataLoading: val =>
     setDataLoadingHelper(SEARCH_MOVIE_ACTIONS_TYPES.SET_LOADING, val),
@@ -157,7 +174,12 @@ export const searchMovieActions: MovieActionType = {
 };
 
 export const favoriteMoviesAction: MovieActionType = {
-  getData: page => getDataHelper(FAVORITE_MOVIE_ACTION_TYPES.GET_DATA, page),
+  getData: ({accountId, page}) =>
+    getFavoritesDataHelper(
+      FAVORITE_MOVIE_ACTION_TYPES.GET_DATA,
+      page,
+      accountId,
+    ),
   setDataLoading: val =>
     setDataLoadingHelper(FAVORITE_MOVIE_ACTION_TYPES.SET_LOADING, val),
   setDataSuccess: response =>
