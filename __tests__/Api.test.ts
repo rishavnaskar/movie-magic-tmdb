@@ -8,5 +8,5 @@ it('Testing image url function', () => {
 });
 
 it('Testing get request token api', async () => {
-  expect(await getRequestToken()).toBeDefined();
+  expect(await getRequestToken()).not.toBeNull();
 });
