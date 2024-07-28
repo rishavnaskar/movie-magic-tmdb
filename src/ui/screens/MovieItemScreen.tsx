@@ -10,15 +10,13 @@ import {
 } from 'react-native';
 import Colors from '../../utils/colors';
 import {CommonStateType, MovieType} from '../../types';
-import {getPostImageUrl} from '../../utils/helper';
+import {addMovieToFavorites, getPostImageUrl} from '../../utils/helper';
 import FontIsto from 'react-native-vector-icons/Fontisto';
 import {useNavigation} from '@react-navigation/native';
 import {HeaderButtonProps} from '@react-navigation/native-stack/lib/typescript/src/types';
 import {useSelector} from 'react-redux';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Snackbar from 'react-native-snackbar';
-import {getRequestToken, setFavoriteMovie} from '../../api/helper';
-import {SCREENS} from '../../navigation/routes';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 
 interface Props {
   route: {params: MovieType};
@@ -28,6 +26,7 @@ const MovieItemScreen = (props: Props) => {
   const item = props?.route?.params ?? {};
 
   const [isAuthInProgress, setIsAuthInProgress] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   const accountId = useSelector(
     (state: CommonStateType) => state.auth.accountId,
@@ -40,30 +39,12 @@ const MovieItemScreen = (props: Props) => {
   const navigation = useNavigation();
 
   const onPressAddFavorite = async () => {
-    setIsAuthInProgress(true);
-    if (accountId) {
-      const response = await setFavoriteMovie(accountId, item.id);
-      if (response) {
-        Snackbar.show({
-          text: 'Successfully added movie to favorites!',
-          duration: Snackbar.LENGTH_LONG,
-        });
-      } else {
-        Snackbar.show({
-          text: 'Failed to add movie to favorites',
-          duration: Snackbar.LENGTH_LONG,
-        });
-      }
-    } else {
-      const requestToken = await getRequestToken();
-      if (requestToken) {
-        navigation.navigate(SCREENS.AUTHENTICATION_WEB_VIEW_SCREEN, {
-          requestToken,
-          isSourceFavoritesIcon: false,
-        });
-      }
-    }
-    setIsAuthInProgress(false);
+    await addMovieToFavorites(
+      navigation,
+      accountId,
+      item.id,
+      setIsAuthInProgress,
+    );
   };
 
   const renderAddFavoriteIcon = ({tintColor}: HeaderButtonProps) =>
@@ -78,6 +59,19 @@ const MovieItemScreen = (props: Props) => {
       />
     );
 
+  const renderImageError = () => {
+    return (
+      <View style={styles.imageErrorContainer}>
+        <MaterialIcon
+          name="report-gmailerrorred"
+          size={150}
+          color={Colors.subTextColor}
+        />
+        <Text style={styles.imageErrorText}>No movie poster found</Text>
+      </View>
+    );
+  };
+
   useEffect(() => {
     navigation.setOptions({headerRight: renderAddFavoriteIcon});
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -85,7 +79,15 @@ const MovieItemScreen = (props: Props) => {
 
   return (
     <ScrollView style={styles.container}>
-      <Image source={imgSource} style={styles.posterImage} />
+      {imgError ? (
+        renderImageError()
+      ) : (
+        <Image
+          source={imgSource}
+          style={styles.posterImage}
+          onError={() => setImgError(true)}
+        />
+      )}
       <Text style={styles.title}>{item.title}</Text>
       <View style={styles.releaseAndRatingContainer}>
         <Text style={styles.releaseDate}>Release: {item.release_date}</Text>
@@ -149,6 +151,24 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 24,
     fontSize: 18,
+  },
+  imageErrorContainer: {
+    height: 520,
+    width: '100%',
+    alignSelf: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: Colors.cardBackground,
+    marginHorizontal: 16,
+    elevation: 10,
+    backgroundColor: Colors.cardBackground,
+  },
+  imageErrorText: {
+    marginTop: 24,
+    color: Colors.subTextColor,
+    fontSize: 20,
   },
 });
 

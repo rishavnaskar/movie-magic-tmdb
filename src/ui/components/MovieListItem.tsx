@@ -8,15 +8,13 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {getPostImageUrl} from '../../utils/helper';
+import {addMovieToFavorites, getPostImageUrl} from '../../utils/helper';
 import {MovieType} from '../../types';
 import FontIsto from 'react-native-vector-icons/Fontisto';
 import {SCREENS} from '../../navigation/routes';
 import {useNavigation} from '@react-navigation/native';
 import Colors from '../../utils/colors';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
-import {getRequestToken, setFavoriteMovie} from '../../api/helper';
-import Snackbar from 'react-native-snackbar';
 
 interface Props {
   item: MovieType;
@@ -30,30 +28,7 @@ const MovieListItem = ({item, accountId}: Props) => {
   const navigation = useNavigation();
 
   const onAddMovieToFavorites = async () => {
-    setIsLoading(true);
-    if (accountId) {
-      const response = await setFavoriteMovie(accountId, item.id);
-      if (response) {
-        Snackbar.show({
-          text: 'Successfully added movie to favorites!',
-          duration: Snackbar.LENGTH_LONG,
-        });
-      } else {
-        Snackbar.show({
-          text: 'Failed to add movie to favorites',
-          duration: Snackbar.LENGTH_LONG,
-        });
-      }
-    } else {
-      const requestToken = await getRequestToken();
-      if (requestToken) {
-        navigation.navigate(SCREENS.AUTHENTICATION_WEB_VIEW_SCREEN, {
-          requestToken,
-          isSourceFavoritesIcon: false,
-        });
-      }
-    }
-    setIsLoading(false);
+    await addMovieToFavorites(navigation, accountId, item.id, setIsLoading);
   };
 
   const onPressMovieItem = (val: MovieType) => {

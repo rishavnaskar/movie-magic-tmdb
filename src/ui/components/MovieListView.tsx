@@ -38,15 +38,17 @@ const MovieListView = ({
   const dispatch = useDispatch();
 
   const getData = (selectedPageNumber: number) => {
-    dispatch(
-      movieAction.getData({
-        page: selectedPageNumber,
-        ...(debouncedSearchTextRef?.current
-          ? {query: debouncedSearchTextRef.current}
-          : {}),
-        ...(accountId ? {accountId} : {}),
-      }),
-    );
+    if (shouldFetchDataInitially) {
+      dispatch(
+        movieAction.getData({
+          page: selectedPageNumber,
+          ...(debouncedSearchTextRef?.current
+            ? {query: debouncedSearchTextRef.current}
+            : {}),
+          ...(accountId ? {accountId} : {}),
+        }),
+      );
+    }
   };
 
   const onEndReached = () => {
@@ -60,12 +62,15 @@ const MovieListView = ({
     }
   };
 
+  const onRefresh = () => {
+    getData(1);
+    setPage(1);
+  };
+
   useEffect(() => {
-    if (shouldFetchDataInitially) {
-      getData(page);
-    }
+    getData(page);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [movieAction, shouldFetchDataInitially]);
+  }, [page]);
 
   const renderHeaderComponent = () => {
     return (
@@ -124,6 +129,7 @@ const MovieListView = ({
           }
           progressBackgroundColor={Colors.cardBackground}
           colors={[Colors.colorAccentPrimary, Colors.colorAccentPrimary]}
+          onRefresh={onRefresh}
         />
       }
       data={movieDataState.data.results}

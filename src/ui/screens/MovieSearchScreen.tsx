@@ -20,7 +20,7 @@ const MovieSearchScreen = () => {
 
   const searchData = (query: string) => {
     debouncedSearchTextRef.current = query;
-    dispatch(searchMovieActions.getData(1, query));
+    dispatch(searchMovieActions.getData({page: 1, query}));
   };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -38,7 +38,6 @@ const MovieSearchScreen = () => {
       placeholder="Search movies..."
       placeholderTextColor={Colors.subTextColor}
       style={styles.searchContainer}
-      autoFocus={true}
     />
   );
 

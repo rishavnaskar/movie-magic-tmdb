@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {ActivityIndicator, StyleSheet, View} from 'react-native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
@@ -11,9 +11,9 @@ import UpcomingScreen from '../ui/screens/movie_tabs/UpcomingScreen';
 import {ROUTES, SCREENS} from './routes';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {CommonStateType} from '../types';
-import {getRequestToken} from '../api/helper';
 import {useSelector} from 'react-redux';
-import {StackActions, useNavigation} from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
+import {showTMDBAlertDialog} from '../utils/helper';
 
 type TabBarIconProps = {
   focused: boolean;
@@ -53,15 +53,7 @@ const TabNavigator = () => {
     if (accountId) {
       navigation.navigate(SCREENS.FAVORITES_SCREEN);
     } else {
-      setIsAuthInProgress(true);
-      const requestToken = await getRequestToken();
-      if (requestToken) {
-        navigation.navigate(SCREENS.AUTHENTICATION_WEB_VIEW_SCREEN, {
-          requestToken,
-          isSourceFavoritesIcon: true,
-        });
-      }
-      setIsAuthInProgress(false);
+      showTMDBAlertDialog(navigation, setIsAuthInProgress);
     }
   };
 
