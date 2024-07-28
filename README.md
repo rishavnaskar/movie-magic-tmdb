@@ -1,79 +1,160 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Movie Magic TMDB
 
-# Getting Started
+[![GitHub stars](https://img.shields.io/github/stars/rishavnaskar/movie-magic-tmdb)](https://github.com/rishavnaskar/movie-magic-tmdb/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/rishavnaskar/movie-magic-tmdb)](https://github.com/rishavnaskar/movie-magic-tmdb/network)
+[![GitHub issues](https://img.shields.io/github/issues/rishavnaskar/movie-magic-tmdb)](https://github.com/rishavnaskar/movie-magic-tmdb/issues)
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+Movie Magic TMDB is a mobile application built using React Native, leveraging The Movie Database (TMDB) API to provide users with comprehensive movie information, including latest releases, popular movies, top-rated films, and upcoming movies. This project is designed to enhance your movie browsing experience with a sleek and user-friendly interface.
 
-## Step 1: Start the Metro Server
+## Table of Contents
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+- [Features](#features)
+- [Demo](#demo)
+- [Setup](#setup)
+- [API Integration](#api-integration)
+- [User Interface](#user-interface)
+- [Additional Features](#additional-features)
+- [Styling and Responsiveness](#styling-and-responsiveness)
+- [Code Quality](#code-quality)
+- [Testing](#testing)
+- [Contact](#contact)
 
-To start Metro, run the following command from the _root_ of your React Native project:
+## Features
 
-```bash
-# using npm
-npm start
+- Browse latest, popular, top-rated, and upcoming movies
+- Search for movies across all categories
+- View detailed movie information, including title, content and rating
+- Favourite movies and view a list of favourites
+- Responsive design for optimal viewing on various devices
 
-# OR using Yarn
-yarn start
-```
+## Demo
 
-## Step 2: Start your Application
+Check out a live demo of the application
 
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
+https://github.com/user-attachments/assets/a3c17ce7-b64b-48ab-b13b-2018d3281009
 
-### For Android
+## Setup
 
-```bash
-# using npm
-npm run android
+1. Initialize a new React Native project using either the React Native CLI or Expo:
+   ```bash
+   npx react-native init MovieMagicTMDB
+   # or with Expo
+   npx expo init MovieMagicTMDB
+   ```
 
-# OR using Yarn
-yarn android
-```
+2. Clone the repository:
+   ```bash
+   git clone https://github.com/rishavnaskar/movie-magic-tmdb.git
+   cd movie-magic-tmdb
+   ```
 
-### For iOS
+3. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-```bash
-# using npm
-npm run ios
+4. Get a new API Access token from - https://developer.themoviedb.org/reference/intro/authentication
+   - Create a `.env` file in the root directory and add your TMDB API key: <br /><br />
+   ```plaintext
+   REACT_APP_TMDB_API_KEY=your_api_key_here
+   ```
 
-# OR using Yarn
-yarn ios
-```
+6. Change the DNS settings to bypass the TMDB block in India:
+   - Use Cloudflare DNS: `1.1.1.1`
+   - Use Google DNS: `8.8.8.8`
+   - Follow instructions [here](https://www.hellotech.com/guide/for/how-to-change-dns-server-windows-mac)
+   - Alternatively, use a free VPN
 
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
+7. Start the development server:
+   ```bash
+   npm start
+   ```
 
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
+## API Integration
 
-## Step 3: Modifying your App
+This project integrates APIs from TMDB. Find theme here:
 
-Now that you have successfully run the app, let's modify it.
+- For fetching Movie Lists
+   - [Now Playing](https://developer.themoviedb.org/reference/movie-now-playing-list)
+   - [Popular](https://developer.themoviedb.org/reference/movie-popular-list)
+   - [Top Rated](https://developer.themoviedb.org/reference/movie-top-rated-list)
+   - [Upcoming](https://developer.themoviedb.org/reference/movie-upcoming-list)
 
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
+- For searching movies
+   - [Searching movies](https://developer.themoviedb.org/reference/search-movie)
 
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
+- For Authentication (required to add favorites)
+   - [User authentication](https://developer.themoviedb.org/reference/intro/authentication)
+   - [Creating a request token](https://developer.themoviedb.org/reference/authentication-create-request-token)
+   - [Authenticating the user](https://developer.themoviedb.org/reference/authentication-how-do-i-generate-a-session-id)
+   - [Creating a session id](https://developer.themoviedb.org/reference/authentication-create-session)
 
-## Congratulations! :tada:
+- For adding favorites
+   - [Add movie to favorites](https://developer.themoviedb.org/reference/account-add-favorite)
+   - [Get favorite movies](https://developer.themoviedb.org/reference/account-get-favorites)
 
-You've successfully run and modified your React Native App. :partying_face:
+## User Interface
 
-### Now what?
+  <tr>
+    <td>
+      <img src="https://github.com/user-attachments/assets/7b8ec376-1145-438d-b483-21c63b86a37d" alt="Image 1" height=400 >
+    </td>
+    <td>
+      <img src="https://github.com/user-attachments/assets/88e77b58-6b6d-4fa4-a445-d0c8095d2eb9" alt="Image 2" height=400 >
+    </td>
+     <td>
+      <img src="https://github.com/user-attachments/assets/c0b84ce7-ac99-4b97-9545-37ac176df2af" alt="Image 2" height=400 >
+    </td>
+     <td>
+      <img src="https://github.com/user-attachments/assets/0ef33690-3498-4462-af75-23fde4fde311" alt="Image 2" height=400 >
+    </td>
+     <td>
+      <img src="https://github.com/user-attachments/assets/68aa4902-d494-4ee1-9df0-c4af3ea23a2a" alt="Image 2" height=400 >
+    </td>
+  </tr>
+</table>
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
+- A tabbed interface to switch between different movie lists (Now Playing, Popular, Top Rated, Upcoming).
+- Each movie item displays:
+  - Movie poster
+  - Movie title
+  - Release date
+  - Average rating
+- Detailed view for each movie, displaying:
+  - Movie poster (larger view)
+  - Movie title
+  - Release date
+  - Average rating
+  - Overview/Description
 
-# Troubleshooting
+## Additional Features
 
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+- Search functionality to search for movies across all categories.
+- Favourite movies and view a list of favourites.
+- Pagination or infinite scrolling for movie lists.
+- Animations or transitions for a better user experience.
 
-# Learn More
+## Styling and Responsiveness
 
-To learn more about React Native, take a look at the following resources:
+- Visually appealing design for a good user experience.
+- Responsive layout for both small and large screen devices.
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+## Code Quality
+
+- Organized and modular codebase.
+- Use of state management (Redux along with Redux Saga).
+- Graceful handling of API errors with appropriate user feedback.
+- Code comments explaining complex logic or decisions.
+
+## Testing
+
+- Unit tests for components and utility functions.
+- Integration or end-to-end tests if possible.
+
+## Contact
+
+For any questions or inquiries, please contact:
+
+- **Name:** Rishav Naskar
+- **Email:** [rishavnaskar.r@gmail.com](mailto:rishavnaskar.r@gmail.com)
+- **LinkedIn:** [rishavnaskar](https://www.linkedin.com/in/rishavnaskar)
